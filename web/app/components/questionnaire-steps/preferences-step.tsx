@@ -33,7 +33,7 @@ export function PreferencesStep({
   });
 
   useImperativeHandle(ref, () => ({
-    validate: () => {
+    validateAndSave: () => {
       const result = form.validate();
       if (!result.hasErrors) {
         localStorage.setItem(localStorageKey, JSON.stringify(form.values));

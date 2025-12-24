@@ -1,4 +1,4 @@
 export interface StepRef {
-  validate: () => boolean;
+  validateAndSave: () => boolean;
 }
 

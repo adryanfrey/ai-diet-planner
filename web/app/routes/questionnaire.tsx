@@ -66,7 +66,7 @@ export default function Questionnaire() {
   };
 
   const handleNext = () => {
-    if (currentStepRef?.current?.validate()) {
+    if (currentStepRef?.current?.validateAndSave()) {
       if (activeStep < totalSteps) {
         setActiveStep(activeStep + 1);
       }
@@ -74,7 +74,7 @@ export default function Questionnaire() {
   };
 
   const handleSubmit = () => {
-    if (currentStepRef?.current?.validate()) {
+    if (currentStepRef?.current?.validateAndSave()) {
       const personalInfo = JSON.parse(
         localStorage.getItem("questionnaire-personal-info") || "{}"
       );
