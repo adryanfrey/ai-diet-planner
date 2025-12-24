@@ -9,7 +9,7 @@ import {
   Center,
 } from "@mantine/core";
 import type { Route } from "./+types/home";
-import { FeatureCard } from "../components/FeatureCard";
+import { FeatureCard } from "../components/feature-card";
 
 export function meta({}: Route.MetaArgs) {
   return [

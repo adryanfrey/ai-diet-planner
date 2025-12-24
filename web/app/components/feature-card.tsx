@@ -1,10 +1,10 @@
 import { Card, Title, Text } from "@mantine/core";
 
-type FeatureCardProps = {
+interface FeatureCardProps {
   icon: string;
   title: string;
   description: string;
-};
+}
 
 export function FeatureCard({ icon, title, description }: FeatureCardProps) {
   return (

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@mantine/core": "^8.3.10",
+    "@mantine/form": "^8.3.10",
     "@mantine/hooks": "^8.3.10",
     "@react-router/node": "7.10.1",
     "@react-router/serve": "7.10.1",
