@@ -13,7 +13,7 @@ import { FeatureCard } from "../components/feature-card";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "AI Diet Planner - Personalized Meal Plans" },
+    { title: "AI Diet - Personalized Meal Plans" },
     {
       name: "description",
       content:

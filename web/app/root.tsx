@@ -10,8 +10,10 @@ import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
 
 import type { Route } from "./+types/root";
+import { AppLayout } from "./components/layout";
 
 export const links: Route.LinksFunction = () => [
+  { rel: "icon", href: "/ai-diet-logo-icon.png" },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
@@ -45,7 +47,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <MantineProvider>
-      <Outlet />
+      <AppLayout>
+        <Outlet />
+      </AppLayout>
     </MantineProvider>
   );
 }
