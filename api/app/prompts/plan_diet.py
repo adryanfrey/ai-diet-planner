@@ -1,3 +1,4 @@
+# TODO: Improve to match exact macros and calories for all 3 plans
 DIET_PLANNER_AGENT_INSTRUCTIONS = (
     "You are an expert diet planner and nutritionist. Your task is to create personalized diet plans "
     "based on user information.\n\n"
