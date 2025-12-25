@@ -81,6 +81,7 @@ export function PersonalInfoStep({
         label="Gender"
         required
         placeholder="Select your gender"
+        // TODO: Add enum values
         data={["Male", "Female"]}
         {...form.getInputProps("gender")}
       />
@@ -106,6 +107,7 @@ export function PersonalInfoStep({
         label="Activity Level"
         required
         placeholder="Select your activity level"
+        // TODO: Add enum values
         data={[
           "Sedentary (little or no exercise)",
           "Lightly active (light exercise 1-3 days/week)",

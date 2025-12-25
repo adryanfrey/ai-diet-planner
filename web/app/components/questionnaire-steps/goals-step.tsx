@@ -60,16 +60,17 @@ export function GoalsStep({ ref, localStorageKey }: GoalsStepProps) {
         {...form.getInputProps("targetWeight")}
       />
       <Select
-        label="How fast to achieve that goal"
+        label="Desired pace to reach your goal"
         placeholder="Select timeline"
         required
+        // TODO: Add enum values
         data={[
-          "No specific timeline (recommended)",
-          "1-2 months",
-          "3-4 months",
-          "5-6 months",
-          "7-12 months",
-          "1-2 years",
+          {
+            value: "Slow and steady",
+            label: "Slow and steady (recommended)",
+          },
+          "Moderate and consistent",
+          "Fast and aggressive",
         ]}
         {...form.getInputProps("goalTimeline")}
       />
