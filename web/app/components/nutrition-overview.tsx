@@ -36,18 +36,18 @@ export function NutritionOverview({
       icon: IconMeat,
     },
     {
-      label: "Carbs",
-      value: nutritionInfo.carbohydrates,
-      percentage: (nutritionInfo.carbohydrates / totalMacros) * 100,
-      color: "yellow",
-      icon: IconBread,
-    },
-    {
       label: "Fats",
       value: nutritionInfo.fats,
       percentage: (nutritionInfo.fats / totalMacros) * 100,
-      color: "blue",
+      color: "yellow",
       icon: IconDroplet,
+    },
+    {
+      label: "Carbs",
+      value: nutritionInfo.carbohydrates,
+      percentage: (nutritionInfo.carbohydrates / totalMacros) * 100,
+      color: "blue",
+      icon: IconBread,
     },
   ];
 

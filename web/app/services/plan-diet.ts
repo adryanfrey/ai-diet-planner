@@ -1,6 +1,6 @@
 import type { DietPlan } from "./types";
 
-export function planDiet(): DietPlan {
+export function planDiet(): DietPlan | null {
   const mockData: DietPlan = {
     nutrition_info: {
       protein: 136.8,

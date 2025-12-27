@@ -1,4 +1,14 @@
-import { Container, Title, Text, SimpleGrid } from "@mantine/core";
+import {
+  SimpleGrid,
+  Container,
+  Title,
+  Text,
+  Stack,
+  Button,
+  Box,
+} from "@mantine/core";
+import { IconSalad, IconClock } from "@tabler/icons-react";
+import { Link } from "react-router";
 import type { Route } from "./+types/my-diet";
 import { planDiet } from "../services/plan-diet";
 import { MealDailyPlanCard } from "../components/meal-daily-plan-card";
@@ -22,6 +32,10 @@ export const loader = async () => {
 
 export default function MyDiet() {
   const { dietPlan } = useLoaderData<typeof loader>();
+
+  if (!dietPlan) {
+    return <EmptyState />;
+  }
 
   return (
     <Container size="lg" py={40}>
@@ -48,6 +62,44 @@ export default function MyDiet() {
           />
         ))}
       </SimpleGrid>
+    </Container>
+  );
+}
+
+function EmptyState() {
+  return (
+    <Container size="sm" py={80}>
+      <Stack align="center" gap="xl">
+        <Box
+          style={{
+            filter: "drop-shadow(0 4px 12px rgba(34, 139, 34, 0.3))",
+          }}
+        >
+          <IconSalad size={80} stroke={1.5} color="#228B22" />
+        </Box>
+
+        <Stack align="center" gap="xs">
+          <Title order={2} ta="center" c="dark.6">
+            No Diet Plan Yet
+          </Title>
+          <Text size="lg" c="dimmed" ta="center" maw={360}>
+            Answer a few quick questions and let our AI create a personalized
+            diet just for you
+          </Text>
+        </Stack>
+
+        <Button component={Link} to="/questionnaire" size="lg" variant="filled">
+          Create My Diet Plan →
+        </Button>
+
+        <Text size="sm" c="dimmed" ta="center">
+          <IconClock
+            size={16}
+            style={{ verticalAlign: "middle", marginRight: 4 }}
+          />
+          Takes only 2 minutes
+        </Text>
+      </Stack>
     </Container>
   );
 }
