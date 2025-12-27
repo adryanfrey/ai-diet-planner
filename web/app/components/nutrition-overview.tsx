@@ -13,7 +13,7 @@ import {
   IconBread,
   IconDroplet,
 } from "@tabler/icons-react";
-import type { NutritionInfo } from "~/services/types";
+import type { NutritionInfo } from "~/types/diet";
 
 interface NutritionOverviewProps {
   nutritionInfo: NutritionInfo;

@@ -10,7 +10,7 @@ import {
   ActionIcon,
 } from "@mantine/core";
 import { IconInfoCircle } from "@tabler/icons-react";
-import type { DailyMealPlan } from "../services/types";
+import type { DailyMealPlan } from "~/types/diet";
 
 interface MealDailyPlanCardProps {
   title: string;

@@ -89,7 +89,13 @@ function EmptyState() {
           </Text>
         </Stack>
 
-        <Button component={Link} to="/questionnaire" size="lg" variant="filled">
+        <Button
+          bg="linear-gradient(135deg, var(--mantine-color-teal-6), var(--mantine-color-cyan-6))"
+          component={Link}
+          to="/questionnaire"
+          size="lg"
+          variant="filled"
+        >
           Create My Diet Plan →
         </Button>
 

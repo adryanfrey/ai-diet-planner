@@ -15,9 +15,16 @@ import { GoalsStep } from "../components/questionnaire-steps/goals-step";
 import { PreferencesStep } from "../components/questionnaire-steps/preferences-step";
 import { RestrictionsStep } from "../components/questionnaire-steps/restrictions-step";
 import type { StepRef } from "../components/questionnaire-steps/types";
-import { useFetcher, useNavigate, type ActionFunctionArgs } from "react-router";
+import {
+  useFetcher,
+  useNavigate,
+  isRouteErrorResponse,
+  type ActionFunctionArgs,
+} from "react-router";
 import { planDiet, type PlanDietData } from "~/services/plan-diet";
 import { dietPlanStorageKey } from "~/services/get-diet-plan";
+import { CustomErrorBoundary } from "~/components/custom-error-boundary";
+import { IconShieldOff, IconClockOff } from "@tabler/icons-react";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -186,3 +193,26 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const dietPlan = await planDiet(questionnaireData);
   return { dietPlan, success: true };
 };
+
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  const defaultGuardrailMessage = "Your request was blocked. Please try again.";
+  const errorsConfig = [
+    {
+      statusCode: 403,
+      icon: IconShieldOff,
+      color: "var(--mantine-color-red-6)",
+      title: "Request Blocked",
+      message: isRouteErrorResponse(error)
+        ? (error.data?.detail ?? defaultGuardrailMessage)
+        : defaultGuardrailMessage,
+    },
+    {
+      statusCode: 408,
+      icon: IconClockOff,
+      color: "var(--mantine-color-orange-6)",
+      title: "Request Timed Out",
+      message: "The request took too long to process. Please try again later.",
+    },
+  ];
+  return <CustomErrorBoundary error={error} errorsConfig={errorsConfig} />;
+}

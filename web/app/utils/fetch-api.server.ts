@@ -40,14 +40,19 @@ async function parseAPIResponse<Expected>(
   response: Response
 ): Promise<APIResponse<Expected>> {
   if (!response.ok) {
-    throw new Response(
-      JSON.stringify({ error: "There was an error calling the API" }),
-      {
-        status: response.status,
-        statusText: response.statusText,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    const text = await response.text();
+    let data;
+
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { error: text || "There was an error calling the API" };
+    }
+    throw new Response(JSON.stringify(data), {
+      status: response.status,
+      statusText: response.statusText,
+      headers: { "Content-Type": "application/json" },
+    });
   }
   return response.json().then((data) => {
     return data;
