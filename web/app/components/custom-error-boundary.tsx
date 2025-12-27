@@ -52,7 +52,7 @@ export function CustomErrorBoundary({
       }}
     >
       <Container size="sm">
-        <Paper radius="lg" p="xl" shadow="sm" withBorder>
+        <Paper radius="lg" p="xl" shadow="sm" withBorder maw={400}>
           <Stack align="center" gap="xl" py="xl">
             <Box
               style={{
@@ -85,9 +85,11 @@ export function CustomErrorBoundary({
               <Title order={2} ta="center" fw={700}>
                 {displayError.title}
               </Title>
-              <Text c="dimmed" size="md" ta="center" maw={400} lh={1.6}>
-                {displayError.message}
-              </Text>
+              <Box mah={150} style={{ overflowY: "auto" }}>
+                <Text c="dimmed" size="md" ta="center" lh={1.6}>
+                  {displayError.message}
+                </Text>
+              </Box>
             </Stack>
 
             <Group gap="md" mt="md">
