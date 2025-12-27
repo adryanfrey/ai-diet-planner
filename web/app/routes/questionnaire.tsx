@@ -1,11 +1,23 @@
-import { Container, Stepper, Button, Group, Stack } from "@mantine/core";
+import {
+  Container,
+  Stepper,
+  Button,
+  Group,
+  Stack,
+  Loader,
+  Center,
+  Text,
+} from "@mantine/core";
 import type { Route } from "../+types/root";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { PersonalInfoStep } from "../components/questionnaire-steps/personal-info-step";
 import { GoalsStep } from "../components/questionnaire-steps/goals-step";
 import { PreferencesStep } from "../components/questionnaire-steps/preferences-step";
 import { RestrictionsStep } from "../components/questionnaire-steps/restrictions-step";
 import type { StepRef } from "../components/questionnaire-steps/types";
+import { useFetcher, useNavigate, type ActionFunctionArgs } from "react-router";
+import { planDiet, type PlanDietData } from "~/services/plan-diet";
+import { dietPlanStorageKey } from "~/services/get-diet-plan";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -18,10 +30,14 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Questionnaire() {
+  const fetcher = useFetcher();
+  const navigate = useNavigate();
   const personalInfoRef = useRef<StepRef>(null);
   const goalsRef = useRef<StepRef>(null);
   const preferencesRef = useRef<StepRef>(null);
   const restrictionsRef = useRef<StepRef>(null);
+  const isSubmitting = fetcher.state === "submitting";
+  const [activeStep, setActiveStep] = useState(0);
 
   const steps = [
     {
@@ -53,9 +69,7 @@ export default function Questionnaire() {
       ref: preferencesRef,
     },
   ];
-
   const totalSteps = steps.length;
-  const [activeStep, setActiveStep] = useState(0);
   const isLastStep = activeStep === totalSteps - 1;
   const currentStepRef = steps[activeStep].ref;
 
@@ -87,15 +101,41 @@ export default function Questionnaire() {
       const restrictions = JSON.parse(
         localStorage.getItem("questionnaire-restrictions") || "{}"
       );
-      const formData = {
+      const questionnaireData = {
         ...personalInfo,
         ...goals,
         ...preferences,
         ...restrictions,
       };
-      // TODO
+      fetcher.submit(
+        { questionnaireData: JSON.stringify(questionnaireData) },
+        { method: "post" }
+      );
     }
   };
+
+  useEffect(() => {
+    if (fetcher.data?.success) {
+      localStorage.setItem(
+        dietPlanStorageKey,
+        JSON.stringify(fetcher.data.dietPlan)
+      );
+      navigate("/my-diet");
+    }
+  }, [fetcher.data, navigate]);
+
+  if (isSubmitting) {
+    return (
+      <Center h="80vh">
+        <Stack align="center" gap="lg">
+          <Loader size="xl" type="dots" />
+          <Text size="lg" c="dimmed">
+            Creating your personalized diet plan, this may take a minute...
+          </Text>
+        </Stack>
+      </Center>
+    );
+  }
 
   return (
     <Container size="md" py={40}>
@@ -137,3 +177,12 @@ export default function Questionnaire() {
     </Container>
   );
 }
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const formData = await request.formData();
+  const questionnaireData = JSON.parse(
+    formData.get("questionnaireData") as string
+  ) as PlanDietData;
+  const dietPlan = await planDiet(questionnaireData);
+  return { dietPlan, success: true };
+};

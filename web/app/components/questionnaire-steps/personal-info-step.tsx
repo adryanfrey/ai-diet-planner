@@ -2,14 +2,7 @@ import { Stack, Title, Select, NumberInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useEffect, useImperativeHandle } from "react";
 import type { StepRef } from "./types";
-
-interface PersonalInfoData {
-  gender: string;
-  height: string;
-  currentWeight: string;
-  age: string;
-  activityLevel: string;
-}
+import type { UserPersonalInfoData } from "~/types/questionnaire-data";
 
 interface PersonalInfoStepProps {
   localStorageKey: string;
@@ -20,13 +13,13 @@ export function PersonalInfoStep({
   ref,
   localStorageKey,
 }: PersonalInfoStepProps) {
-  const form = useForm<PersonalInfoData>({
+  const form = useForm<UserPersonalInfoData>({
     initialValues: {
-      gender: "",
+      gender: "Male" as UserPersonalInfoData["gender"],
       height: "",
       currentWeight: "",
       age: "",
-      activityLevel: "",
+      activityLevel: "" as UserPersonalInfoData["activityLevel"],
     },
     validate: {
       gender: (value) => (!value ? "Gender is required" : null),
@@ -81,7 +74,6 @@ export function PersonalInfoStep({
         label="Gender"
         required
         placeholder="Select your gender"
-        // TODO: Add enum values
         data={["Male", "Female"]}
         {...form.getInputProps("gender")}
       />
@@ -107,7 +99,6 @@ export function PersonalInfoStep({
         label="Activity Level"
         required
         placeholder="Select your activity level"
-        // TODO: Add enum values
         data={[
           "Sedentary (little or no exercise)",
           "Lightly active (light exercise 1-3 days/week)",

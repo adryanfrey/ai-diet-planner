@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.apis.plan_diet import router as plan_diet_router
+from apis.plan_diet import router as plan_diet_router
 
 app = FastAPI()
 

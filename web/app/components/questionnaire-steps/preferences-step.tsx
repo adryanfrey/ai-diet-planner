@@ -2,12 +2,7 @@ import { Stack, Title, Select, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useEffect, useImperativeHandle } from "react";
 import type { StepRef } from "./types";
-
-interface PreferencesData {
-  mealsPerDay: string;
-  foodsToInclude: string;
-  foodsToExclude: string;
-}
+import type { UserPreferencesData } from "~/types/questionnaire-data";
 
 interface PreferencesStepProps {
   localStorageKey: string;
@@ -18,9 +13,9 @@ export function PreferencesStep({
   ref,
   localStorageKey,
 }: PreferencesStepProps) {
-  const form = useForm<PreferencesData>({
+  const form = useForm<UserPreferencesData>({
     initialValues: {
-      mealsPerDay: "",
+      mealsPerDay: "" as UserPreferencesData["mealsPerDay"],
       foodsToInclude: "",
       foodsToExclude: "",
     },

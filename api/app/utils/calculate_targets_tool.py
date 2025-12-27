@@ -1,6 +1,6 @@
 from typing import Annotated, Dict, Literal
 from pydantic import BaseModel, Field
-from app.schemas.plan_diet import (
+from schemas.plan_diet import (
     Gender,
     ActivityLevel,
     DesiredPace,

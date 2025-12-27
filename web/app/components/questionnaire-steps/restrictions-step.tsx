@@ -2,11 +2,7 @@ import { Stack, Title, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useEffect, useImperativeHandle } from "react";
 import type { StepRef } from "./types";
-
-interface RestrictionsData {
-  medicalCondition: string;
-  dietaryRestriction: string;
-}
+import type { UserRestrictionsData } from "~/types/questionnaire-data";
 
 interface RestrictionsStepProps {
   localStorageKey: string;
@@ -17,7 +13,7 @@ export function RestrictionsStep({
   ref,
   localStorageKey,
 }: RestrictionsStepProps) {
-  const form = useForm<RestrictionsData>({
+  const form = useForm<UserRestrictionsData>({
     initialValues: {
       medicalCondition: "",
       dietaryRestriction: "",

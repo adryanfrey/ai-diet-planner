@@ -1,3 +1,4 @@
+import asyncio
 from typing import cast
 from agents import (
     Agent,
@@ -6,26 +7,26 @@ from agents import (
     trace,
 )
 from pydantic import BaseModel
-from app.schemas.plan_diet import (
+from schemas.plan_diet import (
     MealPlannerAgentOutput,
     PostPlanDietRequest,
     InputGuardrailAgentOutput,
     DietPlannerAgentOutput,
 )
-from app.prompts.plan_diet import (
+from prompts.plan_diet import (
     INPUT_GUARDRAIL_AGENT_INSTRUCTIONS,
     DIET_PLANNER_AGENT_INSTRUCTIONS,
     DIET_PLANNER_PROMPT_TEMPLATE,
     MEAL_PLANNER_AGENT_INSTRUCTIONS,
     MEAL_PLANNER_PROMPT_TEMPLATE,
 )
-from app.config import settings
-from app.utils.calculate_targets_tool import (
+from config import settings
+from utils.calculate_targets_tool import (
     calculate_calorie_targets_tool,
 )
-from app.utils.run_with_timeout import run_with_timeout
-from app.exceptions.plan_diet import PlanDietGuardrailException
-from app.schemas.diet import DietPlan
+from utils.run_with_timeout import run_with_timeout
+from exceptions.plan_diet import PlanDietGuardrailException
+from schemas.diet import DietPlan
 
 
 class DietGeneratorServiceConfig(BaseModel):
@@ -131,3 +132,24 @@ class DietGeneratorService:
 
 def get_diet_generator_service() -> DietGeneratorService:
     return DietGeneratorService(DietGeneratorServiceConfig())
+
+
+if __name__ == "__main__":
+    preferences = {
+        "gender": "Male",
+        "height": 183.0,
+        "current_weight": 76.0,
+        "age": 23,
+        "activity_level": "Moderately active (moderate exercise 3-5 days/week)",
+        "target_weight": 80.0,
+        "desired_pace": "Slow and steady",
+        "number_of_meals_per_day": 4,
+        "foods_to_include": "",
+        "foods_to_exclude": "",
+        "medical_condition": "no",
+        "dietary_restrictions": "no",
+    }
+    request = PostPlanDietRequest(**preferences)  # type: ignore[arg-type]
+    service = get_diet_generator_service()
+    diet_plan = asyncio.run(service.plan_diet(request))
+    print(diet_plan.model_dump_json())

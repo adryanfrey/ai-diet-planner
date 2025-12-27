@@ -2,11 +2,7 @@ import { Stack, Title, NumberInput, Select } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useEffect, useImperativeHandle } from "react";
 import type { StepRef } from "./types";
-
-interface GoalsData {
-  targetWeight: string;
-  goalTimeline: string;
-}
+import type { UserGoalsData } from "~/types/questionnaire-data";
 
 interface GoalsStepProps {
   localStorageKey: string;
@@ -14,10 +10,10 @@ interface GoalsStepProps {
 }
 
 export function GoalsStep({ ref, localStorageKey }: GoalsStepProps) {
-  const form = useForm<GoalsData>({
+  const form = useForm<UserGoalsData>({
     initialValues: {
       targetWeight: "",
-      goalTimeline: "",
+      goalTimeline: "" as UserGoalsData["goalTimeline"],
     },
     validate: {
       targetWeight: (value) => {
@@ -63,7 +59,6 @@ export function GoalsStep({ ref, localStorageKey }: GoalsStepProps) {
         label="Desired pace to reach your goal"
         placeholder="Select timeline"
         required
-        // TODO: Add enum values
         data={[
           {
             value: "Slow and steady",

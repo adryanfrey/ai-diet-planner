@@ -10,10 +10,11 @@ import {
 import { IconSalad, IconClock } from "@tabler/icons-react";
 import { Link } from "react-router";
 import type { Route } from "./+types/my-diet";
-import { planDiet } from "../services/plan-diet";
 import { MealDailyPlanCard } from "../components/meal-daily-plan-card";
-import { useLoaderData } from "react-router";
 import { NutritionOverview } from "../components/nutrition-overview";
+import { useEffect, useState } from "react";
+import type { DietPlan } from "~/types/diet";
+import { getDietPlan } from "~/services/get-diet-plan";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -25,13 +26,13 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export const loader = async () => {
-  const dietPlan = planDiet();
-  return { dietPlan };
-};
-
 export default function MyDiet() {
-  const { dietPlan } = useLoaderData<typeof loader>();
+  const [dietPlan, setDietPlan] = useState<DietPlan | null>(null);
+
+  useEffect(() => {
+    const dietPlan = getDietPlan();
+    setDietPlan(dietPlan);
+  }, []);
 
   if (!dietPlan) {
     return <EmptyState />;

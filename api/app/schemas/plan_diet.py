@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Annotated, List
 from pydantic import BaseModel, Field
-from app.schemas.diet import DailyMealPlan, NutritionPlan
+from schemas.diet import DailyMealPlan, NutritionPlan
 
 
 class Gender(str, Enum):
