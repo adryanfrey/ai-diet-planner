@@ -38,6 +38,7 @@ export default function Home() {
       icon: "💬",
       title: "Adjustable",
       description: "Chat with AI to refine your plan",
+      comingSoon: true,
     },
   ];
 
@@ -59,6 +60,7 @@ export default function Home() {
             icon={feature.icon}
             title={feature.title}
             description={feature.description}
+            comingSoon={feature.comingSoon}
           />
         ))}
       </SimpleGrid>
