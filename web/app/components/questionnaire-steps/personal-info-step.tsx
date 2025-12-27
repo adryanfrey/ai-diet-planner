@@ -15,7 +15,7 @@ export function PersonalInfoStep({
 }: PersonalInfoStepProps) {
   const form = useForm<UserPersonalInfoData>({
     initialValues: {
-      gender: "Male" as UserPersonalInfoData["gender"],
+      gender: "" as UserPersonalInfoData["gender"],
       height: "",
       currentWeight: "",
       age: "",
@@ -83,18 +83,6 @@ export function PersonalInfoStep({
         placeholder="Enter your height"
         {...form.getInputProps("height")}
       />
-      <NumberInput
-        label="Current Weight (kg)"
-        required
-        placeholder="Enter your current weight"
-        {...form.getInputProps("currentWeight")}
-      />
-      <NumberInput
-        label="Age"
-        required
-        placeholder="Enter your age"
-        {...form.getInputProps("age")}
-      />
       <Select
         label="Activity Level"
         required
@@ -106,6 +94,18 @@ export function PersonalInfoStep({
           "Very active (hard exercise 6-7 days/week)",
         ]}
         {...form.getInputProps("activityLevel")}
+      />
+      <NumberInput
+        label="Current Weight (kg)"
+        required
+        placeholder="Enter your current weight"
+        {...form.getInputProps("currentWeight")}
+      />
+      <NumberInput
+        label="Age"
+        required
+        placeholder="Enter your age"
+        {...form.getInputProps("age")}
       />
     </Stack>
   );

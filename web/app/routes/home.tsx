@@ -8,6 +8,7 @@ import {
   Stack,
   Center,
 } from "@mantine/core";
+import { IconTarget, IconRobot, IconMessageChatbot } from "@tabler/icons-react";
 import type { Route } from "./+types/home";
 import { FeatureCard } from "../components/feature-card";
 
@@ -25,17 +26,31 @@ export function meta({}: Route.MetaArgs) {
 export default function Home() {
   const features = [
     {
-      icon: "🎯",
+      icon: (
+        <IconTarget
+          size={48}
+          stroke={1.5}
+          color="var(--mantine-color-teal-6)"
+        />
+      ),
       title: "Personalized",
       description: "Plans tailored to your goals and preferences",
     },
     {
-      icon: "🤖",
+      icon: (
+        <IconRobot size={48} stroke={1.5} color="var(--mantine-color-cyan-6)" />
+      ),
       title: "AI-Powered",
       description: "Smart meal suggestions with full nutrition info",
     },
     {
-      icon: "💬",
+      icon: (
+        <IconMessageChatbot
+          size={48}
+          stroke={1.5}
+          color="var(--mantine-color-orange-6)"
+        />
+      ),
       title: "Adjustable",
       description: "Chat with AI to refine your plan",
       comingSoon: true,
@@ -48,9 +63,7 @@ export default function Home() {
         <Title order={1} size="3rem" mb="md">
           AI DIET PLANNER
         </Title>
-        <Text size="xl" c="dimmed">
-          Get personalized meal plans in 2 minutes
-        </Text>
+        <Text size="xl">Get personalized meal plans in 2 minutes</Text>
       </Stack>
 
       <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="lg" mb={40}>
@@ -66,13 +79,7 @@ export default function Home() {
       </SimpleGrid>
 
       <Center>
-        <Button
-          bg="linear-gradient(135deg, var(--mantine-color-teal-6), var(--mantine-color-cyan-6))"
-          component={Link}
-          to="/questionnaire"
-          size="lg"
-          variant="filled"
-        >
+        <Button component={Link} to="/questionnaire" size="lg" variant="filled">
           GET STARTED →
         </Button>
       </Center>

@@ -1,7 +1,8 @@
-import { Card, Title, Text, Badge, Box } from "@mantine/core";
+import { Card, Title, Text, Badge, Box, Center } from "@mantine/core";
+import type { ReactNode } from "react";
 
 interface FeatureCardProps {
-  icon: string;
+  icon: ReactNode;
   title: string;
   description: string;
   comingSoon?: boolean;
@@ -39,9 +40,7 @@ export function FeatureCard({
         </Badge>
       )}
       <Box style={{ filter: comingSoon ? "grayscale(50%)" : "none" }}>
-        <Text size="3rem" mb="md" style={{ textAlign: "center" }}>
-          {icon}
-        </Text>
+        <Center mb="md">{icon}</Center>
         <Title order={3} size="h4" mb="xs" style={{ textAlign: "center" }}>
           {title}
         </Title>

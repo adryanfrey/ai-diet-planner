@@ -6,6 +6,8 @@ import {
   Stack,
   Button,
   Box,
+  Paper,
+  Center,
 } from "@mantine/core";
 import { IconSalad, IconClock } from "@tabler/icons-react";
 import { Link } from "react-router";
@@ -43,7 +45,7 @@ export default function MyDiet() {
       <Title order={1} size="3rem">
         My Diet Plan
       </Title>
-      <Text size="xl" c="dimmed" mb={30}>
+      <Text size="xl" mb={30}>
         Your personalized diet
       </Text>
       <NutritionOverview
@@ -69,44 +71,45 @@ export default function MyDiet() {
 
 function EmptyState() {
   return (
-    <Container size="sm" py={80}>
-      <Stack align="center" gap="xl">
-        <Box
-          style={{
-            filter: "drop-shadow(0 4px 12px rgba(34, 139, 34, 0.3))",
-          }}
-        >
-          <IconSalad size={80} stroke={1.5} color="#228B22" />
-        </Box>
+    <Center h="calc(100vh - 80px)">
+      <Paper p={40} bg="white" radius="lg" shadow="sm" h="60%">
+        <Stack align="center" gap="xl">
+          <Box
+            style={{
+              filter: "drop-shadow(0 4px 12px rgba(34, 139, 34, 0.3))",
+            }}
+          >
+            <IconSalad size={80} stroke={1.5} color="#228B22" />
+          </Box>
 
-        <Stack align="center" gap="xs">
-          <Title order={2} ta="center" c="dark.6">
-            No Diet Plan Yet
-          </Title>
-          <Text size="lg" c="dimmed" ta="center" maw={360}>
-            Answer a few quick questions and let our AI create a personalized
-            diet just for you
+          <Stack align="center" gap="xs">
+            <Title order={2} ta="center" c="dark.6">
+              No Diet Plan Yet
+            </Title>
+            <Text size="lg" c="dimmed" ta="center" maw={360}>
+              Answer a few quick questions and let our AI create a personalized
+              diet just for you
+            </Text>
+          </Stack>
+
+          <Button
+            component={Link}
+            to="/questionnaire"
+            size="lg"
+            variant="filled"
+          >
+            Create My Diet Plan →
+          </Button>
+
+          <Text size="sm" c="dimmed" ta="center">
+            <IconClock
+              size={16}
+              style={{ verticalAlign: "middle", marginRight: 4 }}
+            />
+            Takes only 2 minutes
           </Text>
         </Stack>
-
-        <Button
-          bg="linear-gradient(135deg, var(--mantine-color-teal-6), var(--mantine-color-cyan-6))"
-          component={Link}
-          to="/questionnaire"
-          size="lg"
-          variant="filled"
-        >
-          Create My Diet Plan →
-        </Button>
-
-        <Text size="sm" c="dimmed" ta="center">
-          <IconClock
-            size={16}
-            style={{ verticalAlign: "middle", marginRight: 4 }}
-          />
-          Takes only 2 minutes
-        </Text>
-      </Stack>
-    </Container>
+      </Paper>
+    </Center>
   );
 }

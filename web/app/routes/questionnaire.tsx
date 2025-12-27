@@ -7,6 +7,8 @@ import {
   Loader,
   Center,
   Text,
+  Paper,
+  ScrollArea,
 } from "@mantine/core";
 import type { Route } from "../+types/root";
 import { useState, useRef, useEffect } from "react";
@@ -136,7 +138,7 @@ export default function Questionnaire() {
       <Center h="80vh">
         <Stack align="center" gap="lg">
           <Loader size="xl" type="dots" />
-          <Text size="lg" c="dimmed">
+          <Text size="lg">
             Creating your personalized diet plan, this may take a minute...
           </Text>
         </Stack>
@@ -145,43 +147,57 @@ export default function Questionnaire() {
   }
 
   return (
-    <Container size="md" py={40}>
-      <Stack gap="xl">
-        <Stepper active={activeStep}>
-          {steps.map((step, index) => {
-            const StepComponent = step.component;
-            return (
-              <Stepper.Step
-                key={index}
-                label={step.label}
-                description={step.description}
-              >
-                <StepComponent
-                  ref={step.ref}
-                  localStorageKey={step.localStorageKey}
-                />
-              </Stepper.Step>
-            );
-          })}
-        </Stepper>
+    <Center h="calc(100vh - 80px)">
+      <Paper p={40} bg="white" radius="lg" shadow="sm" h="90%">
+        <Stack gap="xl" h="100%">
+          <ScrollArea flex={1} offsetScrollbars>
+            <Stepper
+              active={activeStep}
+              styles={{
+                steps: {
+                  position: "sticky",
+                  top: 0,
+                  backgroundColor: "white",
+                  zIndex: 10,
+                },
+              }}
+            >
+              {steps.map((step, index) => {
+                const StepComponent = step.component;
+                return (
+                  <Stepper.Step
+                    key={index}
+                    label={step.label}
+                    description={step.description}
+                  >
+                    <StepComponent
+                      ref={step.ref}
+                      localStorageKey={step.localStorageKey}
+                    />
+                  </Stepper.Step>
+                );
+              })}
+            </Stepper>
+          </ScrollArea>
 
-        <Group justify="space-between" mt="xl">
-          <Button
-            variant="default"
-            onClick={handleBack}
-            disabled={activeStep === 0}
-          >
-            ← BACK
-          </Button>
-          <Button
-            variant="filled"
-            onClick={isLastStep ? handleSubmit : handleNext}
-          >
-            {isLastStep ? "SUBMIT" : "NEXT →"}
-          </Button>
-        </Group>
-      </Stack>
-    </Container>
+          <Group justify="space-between">
+            <Button
+              variant="default"
+              onClick={handleBack}
+              disabled={activeStep === 0}
+            >
+              ← BACK
+            </Button>
+            <Button
+              variant="filled"
+              onClick={isLastStep ? handleSubmit : handleNext}
+            >
+              {isLastStep ? "SUBMIT" : "NEXT →"}
+            </Button>
+          </Group>
+        </Stack>
+      </Paper>
+    </Center>
   );
 }
 

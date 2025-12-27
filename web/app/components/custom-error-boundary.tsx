@@ -108,10 +108,6 @@ export function CustomErrorBoundary({
                 size="md"
                 leftSection={<IconRefresh size={18} />}
                 onClick={() => window.location.reload()}
-                style={{
-                  background:
-                    "linear-gradient(135deg, var(--mantine-color-teal-6), var(--mantine-color-cyan-6))",
-                }}
               >
                 Try Again
               </Button>

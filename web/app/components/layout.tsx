@@ -13,7 +13,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   ];
 
   return (
-    <AppShell header={{ height: 80 }}>
+    <AppShell
+      style={{
+        background:
+          "linear-gradient(135deg, color-mix(in srgb, var(--mantine-color-teal-6) 5%, transparent), color-mix(in srgb, var(--mantine-color-cyan-6) 40%, transparent))",
+      }}
+      header={{ height: 80 }}
+    >
       <AppShell.Header>
         <Group
           h="100%"
