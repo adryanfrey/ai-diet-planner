@@ -8,7 +8,7 @@ export interface Meal {
   ingredients: Ingredient[];
 }
 
-interface DailyMealPlan {
+export interface DailyMealPlan {
   description: string;
   meals: Meal[];
 }

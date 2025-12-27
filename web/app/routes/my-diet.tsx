@@ -41,7 +41,11 @@ export default function MyDiet() {
       </Title>
       <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
         {dietPlan.daily_meal_plans.map((plan, index) => (
-          <MealDailyPlanCard key={index} meals={plan.meals} planIndex={index} />
+          <MealDailyPlanCard
+            key={index}
+            plan={plan}
+            title={`Option ${index + 1}`}
+          />
         ))}
       </SimpleGrid>
     </Container>
