@@ -1,13 +1,6 @@
-interface Macros {
-  protein: number;
-  carbohydrates: number;
-  fats: number;
-}
-
 interface Ingredient {
   name: string;
-  quantity: number;
-  macros: Macros;
+  quantity: string;
 }
 
 export interface Meal {
@@ -16,11 +9,19 @@ export interface Meal {
 }
 
 interface DailyMealPlan {
+  description: string;
   meals: Meal[];
 }
 
+export interface NutritionInfo {
+  protein: number;
+  carbohydrates: number;
+  fats: number;
+  calories: number;
+}
+
 export interface DietPlan {
-  calories_per_day: number;
-  macros: Macros;
+  nutrition_info: NutritionInfo;
+  description: string;
   daily_meal_plans: DailyMealPlan[];
 }
