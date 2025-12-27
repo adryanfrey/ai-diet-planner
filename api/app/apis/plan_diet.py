@@ -1,10 +1,11 @@
 import logging
-from agents import InputGuardrailTripwireTriggered, OutputGuardrailTripwireTriggered
+from app.exceptions.plan_diet import PlanDietGuardrailException
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 from app.schemas.api_response_models import BaseResponseModel, ErrorResponseModel
-from app.schemas.plan_diet import DietPlannerResult, PostPlanDietRequest
-from app.services.plan_diet import DietPlannerService, get_diet_planner_service
+from app.schemas.plan_diet import PostPlanDietRequest
+from app.schemas.diet import DietPlan
+from app.services.plan_diet import DietGeneratorService, get_diet_generator_service
 
 logger = logging.getLogger(__name__)
 
@@ -26,24 +27,23 @@ router = APIRouter()
 )
 async def plan_diet(
     request: PostPlanDietRequest,
-    diet_planner_service: DietPlannerService = Depends(get_diet_planner_service),
-) -> BaseResponseModel[DietPlannerResult] | JSONResponse:
+    diet_planner_service: DietGeneratorService = Depends(get_diet_generator_service),
+) -> BaseResponseModel[DietPlan] | JSONResponse:
     try:
         diet_plan = await diet_planner_service.plan_diet(
             request=request,
         )
-        return BaseResponseModel[DietPlannerResult](
+        return BaseResponseModel[DietPlan](
             message="Success",
             result=diet_plan,
         )
 
-    except InputGuardrailTripwireTriggered as e:
-        logger.error(f"Request blocked by input guardrail: {e.guardrail_result}")
-        # TODO: Add guardrail reasoning to the response
+    except PlanDietGuardrailException as e:
+        logger.error(f"Request blocked by input guardrail: {e.message}")
         return JSONResponse(
             status_code=status.HTTP_403_FORBIDDEN,
             content={
-                "detail": "Request blocked by input guardrail. Reason: ",
+                "detail": f"Request blocked by input guardrail. Reason: {e.message}",
             },
         )
 

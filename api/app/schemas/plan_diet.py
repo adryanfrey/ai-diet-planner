@@ -1,14 +1,31 @@
-from typing import Annotated, List, Literal
+from enum import Enum
+from typing import Annotated, List
 from pydantic import BaseModel, Field
-from app.config import settings
-from app.prompts.plan_diet import DIET_PLANNER_AGENT_INSTRUCTIONS
-from app.schemas.daily_meal import DailyMealPlan, Macros
+from app.schemas.diet import DailyMealPlan, NutritionPlan
+
+
+class Gender(str, Enum):
+    MALE = "Male"
+    FEMALE = "Female"
+
+
+class ActivityLevel(str, Enum):
+    SEDENTARY = "Sedentary (little or no exercise)"
+    LIGHTLY_ACTIVE = "Lightly active (light exercise 1-3 days/week)"
+    MODERATELY_ACTIVE = "Moderately active (moderate exercise 3-5 days/week)"
+    VERY_ACTIVE = "Very active (hard exercise 6-7 days/week)"
+
+
+class DesiredPace(str, Enum):
+    SLOW = "Slow and steady"
+    MODERATE = "Moderate and consistent"
+    FAST = "Fast and aggressive"
 
 
 class PostPlanDietRequest(BaseModel):
     """Request schema for requesting a plan diet"""
 
-    gender: Annotated[Literal["Male", "Female"], Field(..., description="Gender")]
+    gender: Annotated[Gender, Field(..., description="Gender")]
     age: Annotated[
         int, Field(ge=16, le=80, description="Age in years between 16 and 80")
     ]
@@ -16,15 +33,7 @@ class PostPlanDietRequest(BaseModel):
         float,
         Field(ge=90, le=250, description="Height in centimeters between 90 and 250"),
     ]
-    activity_level: Annotated[
-        Literal[
-            "Sedentary (little or no exercise)",
-            "Lightly active (light exercise 1-3 days/week)",
-            "Moderately active (moderate exercise 3-5 days/week)",
-            "Very active (hard exercise 6-7 days/week)",
-        ],
-        Field(..., description="Activity level"),
-    ]
+    activity_level: Annotated[ActivityLevel, Field(..., description="Activity level")]
     current_weight: Annotated[
         float,
         Field(
@@ -38,7 +47,7 @@ class PostPlanDietRequest(BaseModel):
         ),
     ]
     desired_pace: Annotated[
-        Literal["Slow and steady", "Moderate and consistent", "Fast and aggressive"],
+        DesiredPace,
         Field(
             ...,
             description="Desired pace to reach your goal of weight loss or gain",
@@ -64,37 +73,21 @@ class PostPlanDietRequest(BaseModel):
     ]
 
 
-class DietPlannerAgentConfig(BaseModel):
-    name: str = "Diet planner agent"
-    instructions: str = DIET_PLANNER_AGENT_INSTRUCTIONS
-    model: str = settings.GLOBAL_LLM_MODEL
-    timeout: float = 35.0
-
-
-class DietPlannerInputGuardrailResult(BaseModel):
+class InputGuardrailAgentOutput(BaseModel):
     is_input_safe: bool
     reasoning: str
 
 
-class DietPlannerResult(BaseModel):
-    calories_per_day: Annotated[
-        int,
-        Field(
-            ..., description="The amount of calories the user should consume per day"
-        ),
-    ]
-    macros: Annotated[
-        Macros,
-        Field(
-            ...,
-            description="The macros nutrients the user should consume per day in grams",
-        ),
-    ]
+class DietPlannerAgentOutput(NutritionPlan):
+    pass
+
+
+class MealPlannerAgentOutput(BaseModel):
     daily_meal_plans: Annotated[
         List[DailyMealPlan],
         Field(
             min_length=3,
             max_length=3,
-            description="The daily meal plans for the user. Fixed value of 3 daily meal plans",
+            description="The 3 daily meal plans for the diet. Fixed value of 3 daily meal plans",
         ),
     ]

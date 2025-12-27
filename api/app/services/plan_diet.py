@@ -1,104 +1,133 @@
-import asyncio
-from typing import Any, cast
+from typing import cast
 from agents import (
     Agent,
-    GuardrailFunctionOutput,
-    InputGuardrail,
-    RunContextWrapper,
     Runner,
-    input_guardrail,
+    WebSearchTool,
     trace,
 )
+from pydantic import BaseModel
 from app.schemas.plan_diet import (
-    DietPlannerAgentConfig,
-    DietPlannerInputGuardrailResult,
-    DietPlannerResult,
+    MealPlannerAgentOutput,
     PostPlanDietRequest,
+    InputGuardrailAgentOutput,
+    DietPlannerAgentOutput,
 )
-from app.schemas.plan_diet import DietPlannerResult
 from app.prompts.plan_diet import (
-    DIET_PLANNER_INPUT_GUARDRAIL_INSTRUCTIONS,
+    INPUT_GUARDRAIL_AGENT_INSTRUCTIONS,
+    DIET_PLANNER_AGENT_INSTRUCTIONS,
     DIET_PLANNER_PROMPT_TEMPLATE,
+    MEAL_PLANNER_AGENT_INSTRUCTIONS,
+    MEAL_PLANNER_PROMPT_TEMPLATE,
 )
 from app.config import settings
+from app.utils.calculate_targets_tool import (
+    calculate_calorie_targets_tool,
+)
 from app.utils.run_with_timeout import run_with_timeout
+from app.exceptions.plan_diet import PlanDietGuardrailException
+from app.schemas.diet import DietPlan
 
 
-class DietPlannerService:
+class DietGeneratorServiceConfig(BaseModel):
+    timeout: float = 20
+    low_cost_llm_model: str = settings.LOW_COST_LLM_MODEL
+    high_cost_llm_model: str = settings.HIGH_COST_LLM_MODEL
+
+
+class DietGeneratorService:
     def __init__(
         self,
-        agent_config: DietPlannerAgentConfig,
+        agent_config: DietGeneratorServiceConfig,
     ):
-        self._agent_config = agent_config
-        self._agent = self._create_agent()
+        self.config = agent_config
+        self._input_guardrail_agent = self._create_input_guardrail_agent()
+        self._meal_planner_agent = self._create_meal_planner_agent()
+        self._diet_planner_agent = self._create_diet_planner_agent()
 
-    def _create_agent(self) -> Agent[DietPlannerResult]:
-        return Agent[DietPlannerResult](
-            name=self._agent_config.name,
-            instructions=self._agent_config.instructions,
-            model=self._agent_config.model,
-            output_type=DietPlannerResult,
-            input_guardrails=[self._create_input_guardrail()],
+    def _create_input_guardrail_agent(self) -> Agent[InputGuardrailAgentOutput]:
+        return Agent[InputGuardrailAgentOutput](
+            name="Input guardrail agent",
+            instructions=INPUT_GUARDRAIL_AGENT_INSTRUCTIONS,
+            model=self.config.low_cost_llm_model,
+            output_type=InputGuardrailAgentOutput,
         )
 
-    def _create_input_guardrail(self) -> InputGuardrail[Any]:
-        agent = Agent[DietPlannerInputGuardrailResult](
-            name="Diet planner input guardrail agent",
-            instructions=DIET_PLANNER_INPUT_GUARDRAIL_INSTRUCTIONS,
-            model=settings.GLOBAL_LLM_MODEL,
-            output_type=DietPlannerInputGuardrailResult,
+    def _create_meal_planner_agent(self) -> Agent[MealPlannerAgentOutput]:
+        return Agent[MealPlannerAgentOutput](
+            name="Meal planner agent",
+            instructions=MEAL_PLANNER_AGENT_INSTRUCTIONS,
+            model=self.config.high_cost_llm_model,
+            output_type=MealPlannerAgentOutput,
         )
 
-        @input_guardrail  # type: ignore[arg-type]
-        async def input_guardrail_fn(
-            _: RunContextWrapper[Any], _agent: Agent[DietPlannerResult], input: str
-        ) -> GuardrailFunctionOutput:
-            result = await run_with_timeout(
-                lambda: Runner.run(agent, input), self._agent_config.timeout
-            )
-            return GuardrailFunctionOutput(
-                output_info=result.final_output,
-                tripwire_triggered=not result.final_output.is_input_safe,
-            )
-
-        return input_guardrail_fn
-
-    def _build_prompt(self, request: PostPlanDietRequest) -> str:
-        return DIET_PLANNER_PROMPT_TEMPLATE.format(
-            **request.model_dump(),
+    def _create_diet_planner_agent(self) -> Agent[DietPlannerAgentOutput]:
+        return Agent[DietPlannerAgentOutput](
+            name="Diet planner agent",
+            instructions=DIET_PLANNER_AGENT_INSTRUCTIONS,
+            model=self.config.high_cost_llm_model,
+            output_type=DietPlannerAgentOutput,
+            tools=[WebSearchTool(), calculate_calorie_targets_tool],
         )
 
-    async def plan_diet(self, request: PostPlanDietRequest) -> DietPlannerResult:
-        prompt = self._build_prompt(request)
+    async def _run_input_guardrail_agent(
+        self, request: PostPlanDietRequest
+    ) -> InputGuardrailAgentOutput:
+        result = await run_with_timeout(
+            lambda: Runner.run(self._input_guardrail_agent, request.model_dump_json()),
+            self.config.timeout,
+        )
+        return cast(InputGuardrailAgentOutput, result.final_output)
 
+    async def _run_meal_planner_agent(
+        self, diet_plan: DietPlannerAgentOutput, request: PostPlanDietRequest
+    ) -> MealPlannerAgentOutput:
+        prompt = MEAL_PLANNER_PROMPT_TEMPLATE.format(
+            calories=diet_plan.nutrition_info.calories,
+            protein=diet_plan.nutrition_info.protein,
+            carbohydrates=diet_plan.nutrition_info.carbohydrates,
+            fats=diet_plan.nutrition_info.fats,
+            description=diet_plan.description,
+            medical_condition=request.medical_condition,
+            dietary_restrictions=request.dietary_restrictions,
+            foods_to_include=request.foods_to_include,
+            foods_to_exclude=request.foods_to_exclude,
+            number_of_meals_per_day=request.number_of_meals_per_day,
+        )
+        result = await run_with_timeout(
+            lambda: Runner.run(self._meal_planner_agent, prompt),
+            self.config.timeout,
+        )
+        return cast(MealPlannerAgentOutput, result.final_output)
+
+    async def _run_diet_planner_agent(
+        self,
+        request: PostPlanDietRequest,
+    ) -> DietPlannerAgentOutput:
+        prompt = DIET_PLANNER_PROMPT_TEMPLATE.format(**request.model_dump())
+        result = await run_with_timeout(
+            lambda: Runner.run(self._diet_planner_agent, prompt),
+            self.config.timeout,
+        )
+        return cast(DietPlannerAgentOutput, result.final_output)
+
+    async def plan_diet(
+        self,
+        request: PostPlanDietRequest,
+    ) -> DietPlan:
         with trace("plan-diet"):
-            result = await run_with_timeout(
-                lambda: Runner.run(self._agent, prompt), self._agent_config.timeout
+            guardrail_result = await self._run_input_guardrail_agent(request)
+            if not guardrail_result.is_input_safe:
+                raise PlanDietGuardrailException(guardrail_result.reasoning)
+
+            diet_plan = await self._run_diet_planner_agent(request)
+            meal_plans = await self._run_meal_planner_agent(diet_plan, request)
+
+            return DietPlan(
+                nutrition_info=diet_plan.nutrition_info,
+                description=diet_plan.description,
+                daily_meal_plans=meal_plans.daily_meal_plans,
             )
 
-        return cast(DietPlannerResult, result.final_output)
 
-
-def get_diet_planner_service() -> DietPlannerService:
-    return DietPlannerService(DietPlannerAgentConfig())
-
-
-if __name__ == "__main__":
-    preferences = {
-        "gender": "Male",
-        "height": 183.0,
-        "current_weight": 76.0,
-        "age": 23,
-        "activity_level": "Moderately active (moderate exercise 3-5 days/week)",
-        "target_weight": 80.0,
-        "desired_pace": "Slow and steady",
-        "number_of_meals_per_day": 4,
-        "foods_to_include": "",
-        "foods_to_exclude": "",
-        "medical_condition": "no",
-        "dietary_restrictions": "no",
-    }
-    request = PostPlanDietRequest(**preferences)  # type: ignore[arg-type]
-    service = get_diet_planner_service()
-    result = asyncio.run(service.plan_diet(request))
-    print(result.model_dump_json())
+def get_diet_generator_service() -> DietGeneratorService:
+    return DietGeneratorService(DietGeneratorServiceConfig())
