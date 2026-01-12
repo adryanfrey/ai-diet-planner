@@ -29,7 +29,7 @@ from schemas.diet import DietPlan
 
 
 class DietGeneratorServiceConfig(BaseModel):
-    timeout: float = 20
+    timeout: float = 30
     low_cost_llm_model: str = settings.LOW_COST_LLM_MODEL
     high_cost_llm_model: str = settings.HIGH_COST_LLM_MODEL
 
